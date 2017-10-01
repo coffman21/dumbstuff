@@ -62,7 +62,7 @@ class App:
 		self.snake = Snake()
 		self.blink = False
 		self.speed = 0.15
-		self.food = (random.randint(0,23), random.randint(0, 79))
+		self.food = (random.randint(1,22), random.randint(1, 78))
 		self.walls = [(0, i) for i in range(self.size[0])]
 		self.walls += [(23, i) for i in range(self.size[0])]
 		self.walls += [(i, 0) for i in range(self.size[1])]
@@ -92,8 +92,8 @@ class App:
 						self.game_over = True
 					self.render()
 					t = time.time()
-				# if i % 10 == 0 and self.speed > 0.05:
-				# 	self.speed -=0.01
+				if i % 100 == 0 and self.speed > 0.1:
+					self.speed -=0.01
 
 
 
@@ -102,22 +102,15 @@ class App:
 		self.blink = not self.blink
 		screen = [[self.chars[4] for i in range(self.size[0])] for j in range(self.size[1])]
 		f = self.food
-		# print(f)
 		screen[f[0]][f[1]] = self.chars[7] if self.blink else self.chars[8]
 		s = self.snake.snake
 		for i, j in s:
-			# print(i, j)
 			screen[i][j] = self.chars[5] if self.blink else self.chars[6]
 		for i, j in self.walls:
-			# print(i, j)
 			screen[i][j] = self.chars[0]
 		screen[-1] = self.chars[0] + "score: " + str(len(s)).zfill(4) + self.chars[0]*58 + 'q to exit' + self.chars[0]
 		if self.game_over:
-			#screen = [[self.chars[1] for i in range(self.size[0])] for j in range(self.size[1])]
 			screen[self.size[1]//2] = ''.join([self.chars[1]*36, 'GAME OVER', self.chars[1]*35])
-		#for i, line in enumerate(self.screen):
-		#	for j, char in enumerate(line):
-		#		self.screen[i][j] = (self.chars[5] if self.blink else 'a') if (i,j) in self.snake.snake else self.chars[3]
 		for i in range(len(screen)):
 			print(''.join([_ for _ in screen[i]]))
 		if self.game_over:
