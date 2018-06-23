@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF8" standalone="yes"?>
+<db>
+    <passport idpass="pass1" toaddr="a1 a2" topers="per1" todept="d1">
+        <series>5151</series>
+        <number>123456</number>
+        <children>
+            <child>
+                <fullName>Odin Odinovich</fullName>
+            </child>
+            <child>
+                <fullName>Dva Dvaevich</fullName>
+            </child>
+        </children>
+        <relations>Single</relations>
+        <photo>https://example.com/ph1.jpg</photo>
+    </passport>
+
+    <person idpers="per1">
+        <fullName>Odinov Odin Odinovich</fullName>
+        <dob>1995-01-01</dob>
+        <gender>M</gender>
+    </person>
+
+    <registration idaddr="a1" topass="pass1">
+        <address>Moscow, ul. Lenina, 1</address>
+        <settleTime>2009-01-01</settleTime>
+    </registration>
+
+    <registration idaddr="a2" topass="pass1">
+        <address>SPB, ul. Stalina, 3</address>
+        <settleTime>1990-01-01</settleTime>
+    </registration>
+
+    <department iddep="d1">
+        <address>ul. Malysheva, 2</address>
+        <city>Moscow</city>
+    </department>
+</db>

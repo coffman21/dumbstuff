@@ -1,0 +1,72 @@
+CREATE TYPE RegAddress AS (
+  ADDRESS VARCHAR(255),
+  SETTLE_DATE CHAR(8),
+  passport Passport
+);
+
+CREATE TYPE Department AS (
+  ADDRESS VARCHAR(255),
+  CITY VARCHAR(100)
+);
+
+CREATE type Person AS (
+  FULL_NAME VARCHAR(255),
+  DOB CHAR(8)
+);
+
+CREATE type Passport AS (
+  SERIES CHAR(4),
+  NUMBER CHAR(6),
+  CHILDREN VARCHAR(255)
+  RELATIONSHIP BOOLEAN,
+  PHOTO BLOB,
+
+  IS_TEMP BOOLEAN,
+  END_DATE BOOLEAN,
+
+  regaddr RegAddress,
+  department Department,
+  person Person
+);
+
+method getAge() RETURNS INT;
+
+CREATE METHOD getAge() RETURNS INT
+FOR Person
+BEGIN
+    RETURN 2018 - SUBSTR(SELF.age, 0, 4)
+END;
+
+CREATE TABLE Tregaddr OF RegAddress
+(
+    REF IS Ida system generated,
+);
+
+CREATE TABLE Tdep OF Department
+(
+    REF IS Idd system generated,
+);
+
+CREATE TABLE Tpers OF Person
+(
+    REF IS Idpers system generated,
+);
+
+CREATE TABLE Tpass OF Passport
+(
+    PRIMARY KEY (series, number),
+    REF IS Idpass system generated,
+);
+
+SELECT person -> full_name
+FROM Tpass
+WHERE person -> dob.getAge() > 18;
+
+CREATE ORDERING FOR Person
+RELATIVE WITH comp BY STATE
+CREATE FUNCTION comp(p1 Person, p2 Person) RETURNS INT
+    IF p1.full_name > p2.fill_name TNEN RETURN 1;
+    ELSE IF p2.dob < p2.dob TNEN RETURN -1;
+    ELSE IF p1.gender > p2.gender TNEN RETURN 1;
+    ELSE RETURN 0;
+    END IF;

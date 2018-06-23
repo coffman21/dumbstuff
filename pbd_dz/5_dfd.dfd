@@ -1,0 +1,24 @@
+<!ELEMENT db (passport*, person*, department+, registration*)>
+<!ELEMENT passport (series, number, children?, relations, photo)>
+<!ELEMENT children (person+)>
+<!ELEMENT person (fullname, dob, gender)>
+<!ELEMENT registration(address, settleTime)>
+<!ELEMENT department(address, city)>
+
+<!ELEMENT series (#PCDATA)>
+<!ELEMENT number (#PCDATA)>
+<!ELEMENT relations (#PCDATA)>
+<!ELEMENT photo (#PCDATA)>
+
+<!ELEMENT fullName (#PCDATA)>
+<!ELEMENT dob (#PCDATA)>
+<!ELEMENT gender (#PCDATA)>
+
+<!ELEMENT address (#PCDATA)>
+<!ELEMENT city (#PCDATA)>
+<!ELEMENT settleTime (#PCDATA)>
+
+<!ATTLIST department iddept ID>
+<!ATTLIST passport idpass ID #REQUIRED toaddr IDREFS topers IDREFS todept IDREFS>
+<!ATTLIST person idpers ID>
+<!ATTLIST registration idaddr ID>
