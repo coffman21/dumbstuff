@@ -4,6 +4,7 @@ import re
 import requests
 from pprint import pprint
 from time import sleep
+import csv
 
 SITE = "https://www.domofond.ru"
 URL = "https://www.domofond.ru/arenda-kvartiry-moskva-c3584"
@@ -20,8 +21,8 @@ PARAMS = {
 REGS = {
     "link": '(<object>\s*<a itemprop=sameAs href=")(.*?)(\" aria-label=\")',
     "price": '(itemprop=price class="e-tile-price m-blue-link">)([^<]+)(\.<\/h2>\s*<span class="e-price-breakdown")',
-    "comission": '(class="e-price-breakdown">)([^<]+)( &nbsp;&nbsp; Залог)',
-    "deposit": '( &nbsp;&nbsp; Залог )([^<]+)(\.<\/span>\s*<span class="e-tile)',
+    "comission": '(class="e-price-breakdown">)([^<]+)( &nbsp;&nbsp;)',
+    "deposit": '(&nbsp;&nbsp; )([^<]+)(\<\/span>\s*<span class="e-tile)',
     "type": '(<span class="e-tile-type m-max-width text-overflow">\s*<strong>)([^<]+)(<\/strong>)',
     "address": '(<span itemprop=address class="m-blue-link text-overflow m-max-width">)([^<]+)(<\/span>)',
     "descr": '(div itemprop=description class="e-description-text">)(.*?)(<\/div>)',
@@ -48,7 +49,7 @@ FAV_STATIONS = {
     'Пролетарская': 'proletarskaya_tagansko-krasnopresnenskaya',
 }
 
-PARSED = {}
+PARSED = []
 
 def parsePagination(i):
     print("parsed {} page:".format(i))
@@ -62,14 +63,24 @@ def parsePagination(i):
     l = len(re.findall(REGS['link'], main_page))
 
     for apt_num in range(l):
-        PARSED[apt_num+cur_len] = {}
+        PARSED.append({})
 
     for key in REGS.keys():
         for idx, prop in enumerate(re.findall(REGS[key], main_page)):
             if key == 'link':
                 PARSED[cur_len+idx][key] = SITE + prop[1]
-            elif key == 'deposit' or key == 'price':
+            elif key == 'price':
                 PARSED[cur_len+idx][key] = "".join(prop[1].split("&#160;")).rstrip(' РУБ')
+            elif key == 'deposit':
+                if prop[1] == 'Без залога':
+                    PARSED[cur_len+idx][key] = '0'
+                else:
+                    PARSED[cur_len+idx][key] = "".join(prop[1].split("&#160;")).lstrip('Залог ').rstrip(' РУБ.')
+            elif key == 'comission':
+                if prop[1] == 'Без комиссии':
+                    PARSED[cur_len+idx][key] = '0'
+                else:
+                    PARSED[cur_len+idx][key] = "".join(prop[1].split("&#160;")).lstrip('Комиссия ').rstrip('%')
             elif key == 'type':
                 PARSED[cur_len+idx][key] = "".join(prop[1].split("&#178;"))
             elif key == 'comission':
@@ -120,5 +131,15 @@ def send_request(url, params):
         return r
 
 
+def convert_to_csv(l):
+    keys = l[0].keys()
+    with open('parsed.csv', 'w') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(l)
+
 parse_all()
 pprint(PARSED)
+
+convert_to_csv(PARSED)
+
