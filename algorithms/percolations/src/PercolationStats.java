@@ -25,8 +25,8 @@ public class PercolationStats {
         mean = StdStats.mean(thresholds);
         stddev = StdStats.stddev(thresholds);
 
-        confLow = mean - ((1.96 * Math.sqrt(stddev)) / Math.sqrt(trials));
-        confHigh = mean + ((1.96 * Math.sqrt(stddev)) / Math.sqrt(trials));
+        confLow = mean - ((1.96 * stddev) / Math.sqrt(trials));
+        confHigh = mean + ((1.96 * stddev) / Math.sqrt(trials));
 
     }
 

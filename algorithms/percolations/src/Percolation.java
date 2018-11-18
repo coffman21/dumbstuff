@@ -69,7 +69,6 @@ public class Percolation {
         connectIfExists(r, c, r+1, c);
         connectIfExists(r, c, r, c-1);
         connectIfExists(r, c, r, c+1);
-
     }
 
     // is site (row, col) open?
@@ -98,7 +97,7 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return uf.connected(0, size - 1);
+        return uf.connected(0, size);
     }
 
     // test client (optional)
