@@ -2,15 +2,15 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    private WeightedQuickUnionUF uf;
+    private final WeightedQuickUnionUF uf;
     private boolean[][] sites;
-    private int n;
-    private int size;
+    private final int n;
+    private final int size;
     private int openSites;
 
     // create n-by-n grid, with all sites blocked
     // throws if n <= 0
-    public Percolation(int n) throws IllegalArgumentException {
+    public Percolation(int n) {
         if (n <= 0) throw new IllegalArgumentException("illegal n : " + n);
 
         this.n = n;
@@ -34,15 +34,22 @@ public class Percolation {
 
         int ptr = (n) * r + c + 1;
 
-        if (ptr > size) throw new IndexOutOfBoundsException(
+        if (ptr > size) throw new IllegalArgumentException(
                 "ptr : " + ptr + ", size : " + size);
         return ptr;
     }
 
 
     // open site (row, col) if it is not open already
-    public void open(int row, int col) throws IllegalArgumentException {
+    public void open(int row, int col) {
+        validate(row, col);
         reallyOpen(row - 1, col - 1);
+    }
+
+    private void validate(int row, int col) {
+        if (row <= 0 || row > n || col <= 0 || col > n) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private void connectIfExists(int r1, int c1, int r2, int c2) {
@@ -50,11 +57,11 @@ public class Percolation {
         int ptr1 = getPtr(r1, c1);
         int ptr2 = getPtr(r2, c2);
 
-        if (ptr1 == -1 || ptr2 == -1) {
-            return;
-        }
         if (r1 == 0) uf.union(0, ptr1);
-        else if (r1 == n-1) uf.union(size, ptr1);
+        if (r1 == n-1) uf.union(size, ptr1);
+
+        if (ptr1 == -1 || ptr2 == -1) return;
+
         if (sites[r2][c2]) uf.union(ptr1, ptr2);
 
     }
@@ -73,7 +80,8 @@ public class Percolation {
 
     // is site (row, col) open?
     // row and column are between 1 and n
-    public boolean isOpen(int row, int col) throws IllegalArgumentException {
+    public boolean isOpen(int row, int col) {
+        validate(row, col);
         return isReallyOpen(row - 1, col - 1);
     }
 
@@ -82,7 +90,7 @@ public class Percolation {
     }
 
     // is site (row, col) full?
-    public boolean isFull(int row, int col) throws IllegalArgumentException {
+    public boolean isFull(int row, int col) {
         return isReallyFull(row - 1, col - 1);
     }
 
@@ -100,7 +108,4 @@ public class Percolation {
         return uf.connected(0, size);
     }
 
-    // test client (optional)
-    public static void main(String[] args) {
-    }
 }

@@ -25,24 +25,23 @@ public class PercolationStats {
         mean = StdStats.mean(thresholds);
         stddev = StdStats.stddev(thresholds);
 
-        confLow = mean - ((1.96 * stddev) / Math.sqrt(trials));
-        confHigh = mean + ((1.96 * stddev) / Math.sqrt(trials));
+        double coef = 1.96;
+        confLow = mean - ((coef * stddev) / Math.sqrt(trials));
+        confHigh = mean + ((coef * stddev) / Math.sqrt(trials));
 
     }
 
     private double experiment(int n) {
         Percolation percolation = new Percolation(n);
-        double counter = 0;
         do {
             int c = StdRandom.uniform(1, n+1);
             int d = StdRandom.uniform(1, n+1);
             if (!percolation.isOpen(c, d)) {
                 percolation.open(c, d);
-                counter++;
             }
         } while (!percolation.percolates());
         double divisor = n * n;
-        return counter / divisor;
+        return percolation.numberOfOpenSites() / divisor;
     }
 
     // sample mean of percolation threshold
