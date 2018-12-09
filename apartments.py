@@ -6,10 +6,10 @@ from pprint import pprint
 from time import sleep
 import csv
 
-SITE = "https://www.domofond.ru"
-URL = "https://www.domofond.ru/arenda-kvartiry-moskva-c3584"
+SITE_DOMOFOND = "https://www.domofond.ru"
+URL_DOMOFOND = "https://www.domofond.ru/arenda-kvartiry-moskva-c3584"
 
-PARAMS = {
+PARAMS_DOMOFOND = {
     "PriceTo": "40000",
     "RentalRate": "Month",
     "Rooms": "Two%2CThree",
@@ -18,7 +18,7 @@ PARAMS = {
     #"Page": "2",
 }
 
-REGS = {
+REGS_DOMOFOND = {
     "link": '(<object>\s*<a itemprop=sameAs href=")(.*?)(\" aria-label=\")',
     "price": '(itemprop=price class="e-tile-price m-blue-link">)([^<]+)(\.<\/h2>\s*<span class="e-price-breakdown")',
     "comission": '(class="e-price-breakdown">)([^<]+)( &nbsp;&nbsp;)',
@@ -51,24 +51,24 @@ FAV_STATIONS = {
 
 PARSED = []
 
-def parsePagination(i):
+def parsePaginationDomofond(i):
     print("parsed {} page:".format(i))
-    new_par = PARAMS
+    new_par = PARAMS_DOMOFOND
     new_par["Page"] = i
-    r = send_request(URL, new_par)
+    r = send_request(URL_DOMOFOND, new_par)
 
     main_page = ''.join(r.text.splitlines())
 
     cur_len = len(PARSED)
-    l = len(re.findall(REGS['link'], main_page))
+    l = len(re.findall(REGS_DOMOFOND['link'], main_page))
 
     for apt_num in range(l):
         PARSED.append({})
 
-    for key in REGS.keys():
-        for idx, prop in enumerate(re.findall(REGS[key], main_page)):
+    for key in REGS_DOMOFOND.keys():
+        for idx, prop in enumerate(re.findall(REGS_DOMOFOND[key], main_page)):
             if key == 'link':
-                PARSED[cur_len+idx][key] = SITE + prop[1]
+                PARSED[cur_len+idx][key] = SITE_DOMOFOND + prop[1]
             elif key == 'price':
                 PARSED[cur_len+idx][key] = "".join(prop[1].split("&#160;")).rstrip(' РУБ')
             elif key == 'deposit':
@@ -97,9 +97,9 @@ def parsePagination(i):
         PARSED[apt_num+cur_len]['sum_time'] = sum((int(_) if type(_) == str else 0 for _ in dir_costs.values()))
 
 
-def parse_all():
+def parse_all_domofond():
     for i in range(1,9):
-        parsePagination(i)
+        parsePaginationDomofond(i)
         sleep(1)
 
 
@@ -138,7 +138,9 @@ def convert_to_csv(l):
         dict_writer.writeheader()
         dict_writer.writerows(l)
 
-parse_all()
+CIAN_QUERY = 'https://www.cian.ru/cat.php?currency=2&deal_type=rent&engine_version=2&loggia=1&maxprice=40000&min_balconies=1&offer_type=flat&pets=1&region=1&room2=1&room3=1&type=-2&wm=1'
+
+parse_all_domofond()
 pprint(PARSED)
 
 convert_to_csv(PARSED)

@@ -20,7 +20,6 @@ class Snake:
 
 	def move(self, key):
 		head = self.snake[0]
-		# print(self.snake)
 		if key == None and self.prev_move != 'init':
 			key = self.prev_move
 		if key != None:
@@ -68,19 +67,22 @@ class App:
 		self.walls += [(i, 0) for i in range(self.size[1])]
 		self.walls += [(i, 79) for i in range(self.size[1])]
 		self.game_over = False
+
+# TODO: use curses instead of curtsies
 	def start(self):
+		current_time = time.time()
 		with Input(keynames='curses') as input_generator:
 			t = time.time()
 			prev = 'init'
 			length = 3
-			for i in count(0, 1):
-				#print(t)
+			# TODO: remove count
+			while(True):
 				e = input_generator.send(timeout=self.speed)
 				if e == None:
 					e = prev
 				else:
-					prev = e
-				# print(self.walls)
+					if e != prev:
+						prev = e
 				if time.time() - t >= self.speed:
 					if self.snake.snake[0] == self.food:
 						self.snake.eat(self.food)
@@ -90,10 +92,11 @@ class App:
 						self.game_over = True
 					if self.snake.snake[0] in self.walls:
 						self.game_over = True
+						# TODO: blink as parameter
 					self.render()
 					t = time.time()
-				if i % 100 == 0 and self.speed > 0.1:
-					self.speed -=0.01
+				#if i % 100 == 0 and self.speed > 0.1:
+					#self.speed -=0.01
 
 
 
@@ -115,7 +118,6 @@ class App:
 			print(''.join([_ for _ in screen[i]]))
 		if self.game_over:
 			exit(0)
-
 
 
 def main():
