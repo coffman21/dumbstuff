@@ -3,20 +3,19 @@ import edu.princeton.cs.algs4.StdRandom;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class RandomizedQueue<T> implements Iterable<T> {
-
-    private T[] arr;
-    private int capacity;
-    private int length;
+public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private static final int INIT_CAPACITY = 8;
 
+    private Item[] arr;
+    private int capacity;
+    private int length;
+
     // construct an empty randomized queue
-    @SuppressWarnings("unchecked")
     public RandomizedQueue() {
         this.length = 0;
         this.capacity = INIT_CAPACITY;
-        arr = (T[]) new Object[capacity];
+        arr = (Item[]) new Object[capacity];
     }
 
     // is the randomized queue empty?
@@ -30,7 +29,7 @@ public class RandomizedQueue<T> implements Iterable<T> {
     }
 
     // add the item
-    public void enqueue(T item) {
+    public void enqueue(Item item) {
         if (item == null) throw new IllegalArgumentException();
         resize();
 
@@ -39,11 +38,12 @@ public class RandomizedQueue<T> implements Iterable<T> {
     }
 
     // remove and return a random item
-    public T dequeue() {
+    public Item dequeue() {
+        if (this.size() == 0) throw new NoSuchElementException();
         resize();
 
         int idx = StdRandom.uniform(0, length);
-        T item = arr[idx];
+        Item item = arr[idx];
         arr[idx] = arr[length-1];
         arr[length-1] = null;
         length--;
@@ -51,26 +51,25 @@ public class RandomizedQueue<T> implements Iterable<T> {
     }
 
     // return a random item (but do not remove it)
-    public T sample() {
+    public Item sample() {
         if (this.size() == 0) throw new NoSuchElementException();
         return arr[StdRandom.uniform(0, length)];
     }
 
-    @SuppressWarnings("unchecked")
     private void resize() {
-        T[] newArr;
+        Item[] newArr;
         if (length == capacity) {
             this.capacity = capacity * 2;
-            newArr = (T[]) new Object[capacity];
+            newArr = (Item[]) new Object[capacity];
         }
         else if (length == capacity / 4 && capacity > INIT_CAPACITY) {
             this.capacity = capacity / 2;
-            newArr = (T[]) new Object[capacity];
+            newArr = (Item[]) new Object[capacity];
         }
         else return;
 
         int idx = 0;
-        for (T item : this) {
+        for (Item item : this) {
             if (item != null) {
                 newArr[idx] = item;
                 idx++;
@@ -80,18 +79,17 @@ public class RandomizedQueue<T> implements Iterable<T> {
     }
 
     // return an independent iterator over items in random order
-    public Iterator<T> iterator() {
+    public Iterator<Item> iterator() {
         return new RandomizedQueueIterator();
     }
 
-    private class RandomizedQueueIterator implements Iterator<T> {
+    private class RandomizedQueueIterator implements Iterator<Item> {
 
-        private T[] queue;
+        private final Item[] queue;
         private int idx;
 
-        @SuppressWarnings("unchecked")
         public RandomizedQueueIterator() {
-            this.queue = (T[]) new Object[length];
+            this.queue = (Item[]) new Object[length];
             for (int i = 0; i < length; i++) {
                 this.queue[i] = arr[i];
             }
@@ -101,12 +99,12 @@ public class RandomizedQueue<T> implements Iterable<T> {
 
         @Override
         public boolean hasNext() {
+            if (length == 0) throw new NoSuchElementException();
             return idx < length;
         }
 
         @Override
-        public T next() {
-            if (length == 0) throw new NoSuchElementException();
+        public Item next() {
             return queue[idx++];
         }
 
@@ -118,11 +116,12 @@ public class RandomizedQueue<T> implements Iterable<T> {
 
     @Override
     public String toString() {
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for (int i = 0; i < capacity; i++) {
-            res += arr[i] + " ";
+            res.append(arr[i]);
+            res.append(" ");
         }
-        return res;
+        return res.toString();
     }
 
     // unit testing (optional)

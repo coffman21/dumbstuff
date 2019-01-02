@@ -1,7 +1,7 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class Deque<T> implements Iterable<T> {
+public class Deque<Item> implements Iterable<Item> {
 
     private Node first;
     private Node last;
@@ -23,86 +23,92 @@ public class Deque<T> implements Iterable<T> {
     }
 
     // add the item to the front
-    public void addFirst(T item) {
+    public void addFirst(Item item) {
         if (item == null) throw new IllegalArgumentException();
         Node oldFirst = this.first;
-        Node first = new Node();
-        first.item = item;
-        first.next = oldFirst;
-        if (oldFirst != null) oldFirst.prev = first;
-        else this.last = first;
-        this.first = first;
+        Node f = new Node();
+        f.item = item;
+        f.next = oldFirst;
+        if (oldFirst != null) oldFirst.prev = f;
+        else this.last = f;
+        this.first = f;
         length++;
     }
 
     // add the item to the end
-    public void addLast(T item) {
+    public void addLast(Item item) {
         if (item == null) throw new IllegalArgumentException();
         Node oldLast = this.last;
-        Node last = new Node();
-        last.item = item;
-        last.prev = oldLast;
-        if (oldLast != null) oldLast.next = last;
-        else this.first = last;
-        this.last = last;
+        Node l = new Node();
+        l.item = item;
+        l.prev = oldLast;
+        if (oldLast != null) oldLast.next = l;
+        else this.first = l;
+        this.last = l;
         length++;
     }
 
     // remove and return the item from the front
-    public T removeFirst() {
-        if (this.isEmpty()) throw new IllegalArgumentException();
+    public Item removeFirst() {
+        if (this.isEmpty()) throw new NoSuchElementException();
         Node removed = first;
         if (first.next != null) {
             first = first.next;
             first.prev = null;
         }
-        else first = null;
+        else first = last = null;
         length--;
         return removed.item;
     }
 
     // remove and return the item from the end
-    public T removeLast() {
-        if (this.isEmpty()) throw new IllegalArgumentException();
+    public Item removeLast() {
+        if (this.isEmpty()) throw new NoSuchElementException();
         Node removed = last;
         if (last.prev != null) {
             last = last.prev;
             last.next = null;
         }
-        else last = null;
+        else last = first = null;
         length--;
         return removed.item;
     }
 
     // return an iterator over items in order from front to end
-    public Iterator<T> iterator() {
+    public Iterator<Item> iterator() {
         return new DequeIterator();
     }
 
     @Override
     public String toString() {
-        String res = "";
+        StringBuilder res = new StringBuilder();
         Node n = this.first;
         while (n.next != null) {
-            res += n.item + " ";
+            res.append(n.item);
+            res.append(" ");
             n = n.next;
         }
-        res += n.item;
-        return res;
+        res.append(n.item);
+        return res.toString();
     }
 
-    private class DequeIterator implements Iterator<T> {
+    private class DequeIterator implements Iterator<Item> {
 
         private Node curr;
-        @Override
-        public boolean hasNext() {
-            return curr.next != null;
+
+        DequeIterator() {
+            this.curr = first;
         }
 
         @Override
-        public T next() {
+        public boolean hasNext() {
+            return curr != null;
+        }
+
+        @Override
+        public Item next() {
             if (isEmpty()) throw new NoSuchElementException();
-            T item = curr.item;
+            Item item = curr.item;
             curr = curr.next;
             return item;
         }
@@ -113,12 +119,12 @@ public class Deque<T> implements Iterable<T> {
     }
 
     private class Node {
-        Node next;
-        Node prev;
-        T item;
+        private Node next;
+        private Node prev;
+        private Item item;
 
-        Node() {}
-        Node(T item) {
+        Node() { }
+        Node(Item item) {
             this.item = item;
         }
     }
@@ -127,17 +133,10 @@ public class Deque<T> implements Iterable<T> {
     // unit testing (optional)
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<>();
-        for (int i = 0; i < 3; i++) {
-            deque.addFirst(i);
-            System.out.println(deque);
-            System.out.println("size: " + deque.size());
-            deque.addLast(i);
-            System.out.println(deque);
-            System.out.println("size: " + deque.size());
-        }
-        for (int i = 0; i < 5; i++) {
-            deque.removeFirst();
-            System.out.println(deque);
-        }
+        deque.addLast(1);
+        deque.removeFirst();
+
+        deque.addFirst(1);
+        deque.removeLast();
     }
 }
