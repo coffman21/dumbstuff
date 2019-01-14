@@ -21,7 +21,6 @@ public class BruteCollinearPoints {
     }
 
     private void findSegments(Point[] points) {
-        int segsIdx = 0;
         for (int i = 0; i < points.length; i++) {
             for (int j = i + 1; j < points.length; j++) {
                 for (int k = j + 1; k < points.length; k++) {

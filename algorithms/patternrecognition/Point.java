@@ -80,7 +80,7 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        return Comparator.comparingDouble(this::compareTo);
+        return Comparator.comparing(this::slopeTo);
     }
 
     /**
