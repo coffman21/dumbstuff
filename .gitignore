@@ -2,3 +2,6 @@
 bin
 
 *.iml
+*.out
+*.swp
+
