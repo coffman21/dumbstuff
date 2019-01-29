@@ -1,12 +1,10 @@
-import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.StreamSupport;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author kkharitonov
@@ -14,45 +12,85 @@ import java.util.stream.StreamSupport;
  */
 public class Solver {
 
-    private int moves = 0;
+    private int moves;
     private Node goal;
-
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
 
-                
-        MinPQ<Node> queue = new MinPQ<>();
+        moves = 0;
+        Board twin = initial.twin();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        Node predecessor = null;
-        Board current = initial;
+        Thread t1 = new Thread(
+                new Worker(initial, false, countDownLatch));
+        Thread t2 = new Thread(
+                new Worker(twin, true, countDownLatch));
 
-        queue.insert(new Node(initial.manhattan(), initial, predecessor));
-        Node currentNode = null;
+        try {
+            t1.start();
+            t2.start();
+            countDownLatch.await();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-        while (!current.isGoal()) {
-            moves++;
-            queue.delMin();
+    private class Worker implements Runnable {
 
-            for (Board board : current.neighbors()) {
-                if (predecessor == null || !board.equals(predecessor.board)) {
-                    queue.insert(new Node(moves + board.manhattan(), board, predecessor));
+        private Board initial;
+        private boolean isTwin;
+        private CountDownLatch countDownLatch;
+
+        public Worker(Board initial, boolean isTwin, CountDownLatch countDownLatch) {
+            this.initial = initial;
+            this.isTwin = isTwin;
+            this.countDownLatch = countDownLatch;
+        }
+
+        @Override
+        public void run() {
+            int mvs = 0;
+            MinPQ<Node> queue = new MinPQ<>();
+
+            Node predecessor = null;
+            Board current = initial;
+
+            queue.insert(new Node(initial.manhattan(), initial, predecessor));
+            Node currentNode = null;
+
+            while (!current.isGoal()) {
+                mvs++;
+                queue.delMin();
+
+                for (Board board : current.neighbors()) {
+                    if (predecessor == null || !board.equals(predecessor.board)) {
+                        queue.insert(new Node(mvs + board.manhattan(), board, predecessor));
+                    }
+                }
+
+                predecessor = new Node(mvs - 1 + current.manhattan(), current, predecessor);
+                currentNode = queue.min();
+                current = currentNode.board;
+
+                if (goal != null) {
+                    return;
                 }
             }
-
-            predecessor = new Node(moves - 1 + current.manhattan(), current, predecessor);
-            currentNode = queue.min();
-            current = currentNode.board;
-
+            if (!isTwin) {
+                goal = currentNode;
+                moves = mvs;
+            }
+            countDownLatch.countDown();
         }
-        goal = currentNode;
     }
 
 
     // is the initial board solvable?
     public boolean isSolvable() {
-        return moves != -1;
+        return goal != null;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
