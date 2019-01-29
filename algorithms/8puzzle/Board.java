@@ -100,10 +100,10 @@ public class Board {
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
                 if (blocks[i][j] == 0) {
-                    if (i != 0) boards.add(createNeighbourBoard(i, j, Direction.LEFT));
-                    if (i != dimension-1) boards.add(createNeighbourBoard(i, j, Direction.RIGHT));
-                    if (j != 0) boards.add(createNeighbourBoard(i, j, Direction.UP));
-                    if (j != dimension-1) boards.add(createNeighbourBoard(i, j, Direction.DOWN));
+                    if (i != 0) boards.add(createNeighbourBoard(i, j, Direction.UP));
+                    if (i != dimension-1) boards.add(createNeighbourBoard(i, j, Direction.DOWN));
+                    if (j != 0) boards.add(createNeighbourBoard(i, j, Direction.LEFT));
+                    if (j != dimension-1) boards.add(createNeighbourBoard(i, j, Direction.RIGHT));
                 }
             }
         }
