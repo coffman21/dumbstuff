@@ -8,15 +8,21 @@ import java.util.List;
  */
 public class Board {
 
-    private int[][] blocks;
-    private int dimension;
-    private int manhattanDistance;
+    private final int[][] blocks;
+    private final int dimension;
+    private final int manhattanDistance;
 
     // construct a board from an n-by-n array of blocks (where blocks[i][j] = block in row i, column j)
     public Board(int[][] blocks) {
-        this.blocks = blocks;
+        this.blocks = copyBlocks(blocks);
         this.dimension = blocks.length;
         this.manhattanDistance = findManhattanDistance();
+    }
+
+    private int[][] copyBlocks(int[][] blocksCopy) {
+        return Arrays.stream(blocksCopy)
+                .map(int[]::clone)
+                .toArray(int[][]::new);
     }
 
     // board dimension n
@@ -80,11 +86,15 @@ public class Board {
     }
 
     // does this board equal y?
-    public boolean equals(Board that) {
-        if (this.dimension != that.dimension) return false;
+    @Override
+    public boolean equals(Object that) {
+        if (that == null) return false;
+        if (that.getClass() != this.getClass()) return false;
+        Board board = (Board) that;
+        if (this.dimension != board.dimension) return false;
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
-                if (blocks[i][j] != that.blocks[i][j]) return false;
+                if (blocks[i][j] != board.blocks[i][j]) return false;
             }
         }
         return true;
@@ -111,9 +121,7 @@ public class Board {
     }
 
     private Board createNeighbourBoard(int i, int j, Direction d) {
-        int[][] newBlocks = Arrays.stream(blocks)
-                .map(int[]::clone)
-                .toArray(int[][]::new);
+        int[][] newBlocks = copyBlocks(blocks);
         int tmp = newBlocks[i][j];
         switch (d) {
             case LEFT:
@@ -138,7 +146,7 @@ public class Board {
 
     // string representation of this board (in the output format specified below)
     //
-    //3
+    // 3
     // 0  1  3
     // 4  2  5
     // 7  8  6
