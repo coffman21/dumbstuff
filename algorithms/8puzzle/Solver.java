@@ -4,7 +4,6 @@ import edu.princeton.cs.algs4.StdOut;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @author kkharitonov
@@ -20,77 +19,57 @@ public class Solver {
         if (initial == null) throw new IllegalArgumentException();
 
         moves = 0;
+        MinPQ<Node> queue = new MinPQ<>();
+        MinPQ<Node> twinQueue = new MinPQ<>();
+
+        Board current = initial;
         Board twin = initial.twin();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        Thread t1 = new Thread(
-                new Worker(initial, false, countDownLatch));
-        Thread t2 = new Thread(
-                new Worker(twin, true, countDownLatch));
+        queue.insert(new Node(initial.manhattan(), initial, null));
+        twinQueue.insert(new Node(twin.manhattan(), twin, null));
 
-        try {
-            t1.start();
-            t2.start();
-            countDownLatch.await();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+        Node predecessor = null;
+        Node twinPredecessor = null;
 
-    private class Worker implements Runnable {
+        Node currentNode = null;
+        Node twinCurrentNode = null;
 
-        private Board initial;
-        private boolean isTwin;
-        private CountDownLatch countDownLatch;
+        while (!current.isGoal() && !twin.isGoal()) {
+            moves++;
+            queue.delMin();
+            twinQueue.delMin();
 
-        public Worker(Board initial, boolean isTwin, CountDownLatch countDownLatch) {
-            this.initial = initial;
-            this.isTwin = isTwin;
-            this.countDownLatch = countDownLatch;
-        }
-
-        @Override
-        public void run() {
-            int mvs = 0;
-            MinPQ<Node> queue = new MinPQ<>();
-
-            Node predecessor = null;
-            Board current = initial;
-
-            queue.insert(new Node(initial.manhattan(), initial, predecessor));
-            Node currentNode = null;
-
-            while (!current.isGoal()) {
-                mvs++;
-                queue.delMin();
-
-                for (Board board : current.neighbors()) {
-                    if (predecessor == null || !board.equals(predecessor.board)) {
-                        queue.insert(new Node(mvs + board.manhattan(), board, predecessor));
-                    }
-                }
-
-                predecessor = new Node(mvs - 1 + current.manhattan(), current, predecessor);
-                currentNode = queue.min();
-                current = currentNode.board;
-
-                if (goal != null) {
-                    return;
+            for (Board board : current.neighbors()) {
+                if (predecessor == null || !board.equals(predecessor.board)) {
+                    queue.insert(new Node(moves + board.manhattan(), board, predecessor));
                 }
             }
-            if (!isTwin) {
-                goal = currentNode;
-                moves = mvs;
+            for (Board board : twin.neighbors()) {
+                if (twinPredecessor == null || !board.equals(twinPredecessor.board)) {
+                    twinQueue.insert(new Node(moves + board.manhattan(), board, twinPredecessor));
+                }
             }
-            countDownLatch.countDown();
+
+            predecessor = new Node(moves - 1 + current.manhattan(), current, predecessor);
+            twinPredecessor = new Node(moves - 1 + twin.manhattan(), twin, twinPredecessor);
+
+            currentNode = queue.min();
+            twinCurrentNode = twinQueue.min();
+
+            current = currentNode.board;
+            twin = twinCurrentNode.board;
+        }
+        if (current.isGoal()) {
+            goal = currentNode;
+        } else {
+            moves = -1;
         }
     }
 
 
     // is the initial board solvable?
     public boolean isSolvable() {
-        return goal != null;
+        return moves != -1;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
@@ -142,7 +121,7 @@ public class Solver {
 //                blocks[i][j] = in.readInt();
 //        Board initial = new Board(blocks);
 
-        Board initial = new Board(new int[][]{{0, 1, 3}, {4, 2, 5}, {7, 8, 6}});
+        Board initial = new Board(new int[][]{{0, 3, 1}, {4, 2, 5}, {7, 8, 6}});
         // solve the puzzle
         Solver solver = new Solver(initial);
 
