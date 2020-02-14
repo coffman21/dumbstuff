@@ -5,3 +5,7 @@ bin
 *.out
 *.swp
 
+*.zip
+*.txt
+
+algorithms/.lift/
