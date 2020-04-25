@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 class SnailMatrix {
     public static void main(String[] args) {
         printMatrix(snail(0));

@@ -18,53 +18,6 @@ public class Solver {
     public Solver(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
 
-<<<<<<< HEAD
-        moves = 0;
-        MinPQ<Node> queue = new MinPQ<>();
-        MinPQ<Node> twinQueue = new MinPQ<>();
-
-        Board current = initial;
-        Board twin = initial.twin();
-
-        queue.insert(new Node(initial.manhattan(), initial, null));
-        twinQueue.insert(new Node(twin.manhattan(), twin, null));
-
-        Node predecessor = null;
-        Node twinPredecessor = null;
-
-        Node currentNode = null;
-        Node twinCurrentNode = null;
-
-        while (!current.isGoal() && !twin.isGoal()) {
-            moves++;
-            queue.delMin();
-            twinQueue.delMin();
-
-            for (Board board : current.neighbors()) {
-                if (predecessor == null || !board.equals(predecessor.board)) {
-                    queue.insert(new Node(moves + board.manhattan(), board, predecessor));
-                }
-            }
-            for (Board board : twin.neighbors()) {
-                if (twinPredecessor == null || !board.equals(twinPredecessor.board)) {
-                    twinQueue.insert(new Node(moves + board.manhattan(), board, twinPredecessor));
-                }
-            }
-
-            predecessor = new Node(moves - 1 + current.manhattan(), current, predecessor);
-            twinPredecessor = new Node(moves - 1 + twin.manhattan(), twin, twinPredecessor);
-
-            currentNode = queue.min();
-            twinCurrentNode = twinQueue.min();
-
-            current = currentNode.board;
-            twin = twinCurrentNode.board;
-        }
-        if (current.isGoal()) {
-            goal = currentNode;
-        } else {
-            moves = -1;
-=======
         MinPQ<Node> queue = new MinPQ<>();
         MinPQ<Node> twinQueue = new MinPQ<>();
         Board current = initial;
@@ -106,14 +59,13 @@ public class Solver {
                     twinQueue.insert(new Node(twinMoves+1, board.manhattan(), board, twinCurrentNode));
                 }
             }
->>>>>>> bea48b6d8140eb74cd764fe174a85d7a16ab48f1
         }
 
     }
 
     // is the initial board solvable?
     public boolean isSolvable() {
-        return moves != -1;
+        return goal != null;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
@@ -160,17 +112,6 @@ public class Solver {
 
     // solve a slider puzzle (given below)
     public static void main(String[] args) {
-<<<<<<< HEAD
-//        In in = new In(args[0]);
-//        int n = in.readInt();
-//        int[][] blocks = new int[n][n];
-//        for (int i = 0; i < n; i++)
-//            for (int j = 0; j < n; j++)
-//                blocks[i][j] = in.readInt();
-//        Board initial = new Board(blocks);
-
-        Board initial = new Board(new int[][]{{0, 3, 1}, {4, 2, 5}, {7, 8, 6}});
-=======
 
 //        Board initial = new Board(new int[][]{{2, 3, 1}, {4, 0, 5}, {7, 8, 6}});
 
@@ -182,7 +123,6 @@ public class Solver {
                 blocks[i][j] = in.readInt();
         Board initial = new Board(blocks);
 
->>>>>>> bea48b6d8140eb74cd764fe174a85d7a16ab48f1
         // solve the puzzle
         Solver solver = new Solver(initial);
 
